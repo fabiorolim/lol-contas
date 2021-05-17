@@ -33,3 +33,22 @@ class CategoriaForm(forms.ModelForm):
         widgets = {'descricao': forms.TextInput(
             attrs={'class': 'form-control form-control-user',
                    'placeholder': 'Descrição'})}
+
+
+class SimuladorForm(forms.Form):
+    valor = forms.DecimalField(widget=forms.NumberInput(
+        attrs={'class': 'form-control form-control-user',
+               'placeholder': 'Valor R$'}))
+    entrada = forms.DecimalField(widget=forms.NumberInput(
+        attrs={'class': 'form-control form-control-user',
+               'placeholder': 'Entrada R$'}))
+    taxa = forms.DecimalField(widget=forms.NumberInput(
+        attrs={'class': 'form-control form-control-user',
+               'placeholder': 'Taxa a.m'}))
+    prazo = forms.IntegerField(widget=forms.NumberInput(
+        attrs={'class': 'form-control form-control-user',
+               'placeholder': 'Prazo em meses'}))
+    tipo = forms.CharField(widget=forms.Select(
+        choices=(('P', 'Price'), ('S', 'SAC')),
+        attrs={'class': 'form-control form-control-user',
+               'placeholder': 'Tipo'}))

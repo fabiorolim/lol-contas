@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 
 from .views import dashboard, categoria, conta, categorias, contas, \
-    editar_conta, deletar_conta, editar_categoria, deletar_categoria
+    editar_conta, deletar_conta, editar_categoria, deletar_categoria, simulador
 
 urlpatterns = [
     path('', dashboard, name='dashboard'),
@@ -31,4 +31,5 @@ urlpatterns = [
          name='editar_categoria'),
     path('deletar_categoria/<int:id>', deletar_categoria,
          name='deletar_categoria'),
+    path('simulador', simulador, name='simulador')
 ]

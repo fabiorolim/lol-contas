@@ -5,11 +5,11 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import CategoriaForm, ContaForm
+from .forms import CategoriaForm, ContaForm, SimuladorForm
 from .models import Conta, Categoria
 
+from .simulador_financeiro import Sac, Price
 
-# Create your views here.
 
 @login_required(login_url='login')
 def dashboard(request):
@@ -92,32 +92,6 @@ def conta(request):
 
             return redirect('contas')
 
-    #     descricao = request.POST['descricao']
-    #     categoria = request.POST['categoria']
-    #     valor = request.POST['valor']
-    #     data = request.POST['data']
-    #     tipo = request.POST['tipo']
-    #
-    #     usuario_logado = get_object_or_404(User, pk=request.user.id)
-    #
-    #     print(descricao, categoria, valor, data, tipo, usuario_logado)
-    #
-    #     categoria = Categoria.objects.get(id=categoria)
-    #
-    #     conta = Conta.objects.create(descricao=descricao, valor=valor,
-    #                                  tipo=tipo, categoria=categoria,
-    #                                  data=data, usuario=usuario_logado)
-    #     conta.save()
-    #
-    #     return redirect('contas')
-    #
-    # categorias = Categoria.objects.filter(usuario=request.user.id)
-    #
-    # context = {
-    #     'categorias': categorias
-    # }
-    # return render(request, 'core/nova_conta.html', context)
-
 
 @login_required(login_url='login')
 def contas(request):
@@ -144,35 +118,6 @@ def editar_conta(request, id):
 
             return redirect('contas')
 
-    # if request.method == 'GET':
-    #     categorias = Categoria.objects.all()
-    #     conta = Conta.objects.get(id=id)
-    #     print(conta.descricao, conta.valor, conta.data)
-    #     context = {
-    #         'conta': conta,
-    #         'categorias': categorias
-    #     }
-    #
-    #     return render(request, 'core/editar_conta.html', context)
-    #
-    # else:
-    #     descricao = request.POST['descricao']
-    #     categoria = request.POST['categoria']
-    #     valor = request.POST['valor']
-    #     data = request.POST['data']
-    #     tipo = request.POST['tipo']
-    #
-    #     print(valor, data)
-    #
-    #     # usuario_logado = get_object_or_404(User, pk=request.user.id)
-    #
-    #     Conta.objects.filter(id=id).update(descricao=descricao,
-    #                                        valor=valor, tipo=tipo,
-    #                                        categoria=categoria,
-    #                                        data=data)
-    #
-    #     return redirect('contas')
-
 
 @login_required(login_url='login')
 def deletar_conta(request, id):
@@ -184,13 +129,7 @@ def deletar_conta(request, id):
 @login_required(login_url='login')
 def categoria(request):
     if request.method == 'POST':
-        # descricao = request.POST['descricao']
-        # print(descricao)
         usuario_logado = get_object_or_404(User, pk=request.user.id)
-        # nova_categoria = Categoria.objects.create(descricao=descricao,
-        #                                           usuario=usuario_logado)
-        # nova_categoria.save()
-
         form = CategoriaForm(request.POST)
 
         if form.is_valid():
@@ -220,23 +159,6 @@ def categorias(request):
 
 @login_required(login_url='login')
 def editar_categoria(request, id):
-    # if request.method == 'GET':
-    #     categoria = Categoria.objects.get(id=id)
-    #     context = {
-    #         'categoria': categoria
-    #     }
-    #
-    #     return render(request, 'core/editar_categoria.html', context)
-    #
-    # else:
-    #     descricao = request.POST['descricao']
-    #
-    #
-    #
-    #     Categoria.objects.filter(id=id).update(descricao=descricao)
-    #
-    #     return redirect('categorias')
-
     categoria = Categoria.objects.get(id=id)
 
     if request.method == 'GET':
@@ -258,3 +180,48 @@ def deletar_categoria(request, id):
     categoria = Categoria.objects.get(id=id)
     categoria.delete()
     return redirect('categorias')
+
+
+@login_required(login_url='login')
+def simulador(request):
+    if request.method == 'GET':
+        form = SimuladorForm()
+
+        return render(request, 'core/nova_simulacao.html', {'form': form})
+
+    else:
+        form = SimuladorForm(data=request.POST)
+        if form.is_valid():
+            if form['tipo'].value() == 'S':
+                sac = Sac(float(form['valor'].value()),
+                          float(form['taxa'].value()),
+                          int(form['prazo'].value()),
+                          float(form['entrada'].value()))
+                sac.generate_lists()
+                context = {
+                    'total': sac.total,
+                    'entrada': sac.entry,
+                    'prazo': sac.n,
+                    'taxa': sac.i * 100,
+                    'saldo_devedor_inicial': sac.total - sac.entry,
+                    'custo_efetivo': sac.efective_cost_total(),
+                    'table': sac.generate_table()
+                }
+
+            elif form['tipo'].value() == 'P':
+                price = Price(float(form['valor'].value()),
+                              float(form['taxa'].value()),
+                              int(form['prazo'].value()),
+                              float(form['entrada'].value()))
+                price.generate_lists()
+                context = {
+                    'total': price.total,
+                    'entrada': price.entry,
+                    'prazo': price.n,
+                    'taxa': price.i * 100,
+                    'saldo_devedor_inicial': price.total - price.entry,
+                    'custo_efetivo': price.efective_cost_total(),
+                    'table': price.generate_table()
+                }
+
+            return render(request, 'core/tabela_simulacao.html', context)
