@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+
+<!-- Begin Page Content -->
+{% block content %}
+    <div id="content-wrapper" class="d-flex flex-column">
+
+    <!-- Main Content -->
+    <div id="content">
+
+    {% include 'core/topbar.html' %}
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <!-- Page Heading -->
+        <h1 class="h3 mb-2 text-gray-800">Contas</h1>
+
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Dados das
+                    movimentações</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable"
+                           width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th>Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th>Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                        </tfoot>
+                        <tbody>
+                        {% for m in movimentacoes %}
+                            <tr>
+                                <td>{{ m.descricao }}</td>
+                                <td>R$ {{ m.valor }}</td>
+                                <td>{{ m.tipo }}</td>
+                                <td>{{ m.data|date:"SHORT_DATE_FORMAT" }}</td>
+                                <td>{{ m.categoria.descricao }}</td>
+                                <td>
+                                    <a class="btn-circle btn-sm btn-warning"
+                                       href="{% url 'editar_movimentacao' m.id %}">edt</a>
+                                    <a class="btn-circle btn-sm btn-danger i fas fa-trash"
+                                       href="{% url 'deletar_movimentacao' m.id %}"></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+    <!-- End of Main Content -->
+{% endblock %}
+
+<!-- Footer -->
+{% include 'core/footer.html' %}
+<!-- End of Footer -->
+
+</div>
+<!-- End of Content Wrapper -->
+
+</div>
+</div>
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+{% include 'autenticacao/logout.html' %}
+
+
+</body>
+
+</html>
