@@ -1,5 +1,5 @@
 """
-WSGI config for lol project.
+WSGI config for lol-contas project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
